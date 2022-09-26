@@ -12,6 +12,7 @@ public class Car : MonoBehaviour
 
     private int _steerValue;
 
+// Update
     private void Update()
     {
         _speed += _speedGainPerSecond * Time.deltaTime;
@@ -21,6 +22,7 @@ public class Car : MonoBehaviour
         transform.Translate(Vector3.forward * _speed * Time.deltaTime);
     }
 
+// OnTriggerEnter
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Obstacle"))
@@ -29,6 +31,7 @@ public class Car : MonoBehaviour
         }        
     }
 
+// Steer
     public void Steer(int value)
     {
         _steerValue = value;
