@@ -6,6 +6,7 @@ using UnityEngine;
 public class Score : MonoBehaviour
 {
     [SerializeField] private TMP_Text _scoreText;
+
     [SerializeField] private float _scoreMultiplier;
 
     public const string HighScoreKey = "HighScore";
@@ -15,14 +16,16 @@ public class Score : MonoBehaviour
     private int _currentHighScore;
 
 
-// Update
+
+    // Update
     private void Update()
     {
         _score += Time.deltaTime * _scoreMultiplier;
         _scoreText.text = Mathf.FloorToInt(_score).ToString();
+
     }
 
-// OnDestroy
+    // OnDestroy
     private void OnDestroy()
     {
         _currentHighScore = PlayerPrefs.GetInt(HighScoreKey, 0);
@@ -32,4 +35,5 @@ public class Score : MonoBehaviour
             PlayerPrefs.SetInt(HighScoreKey, Mathf.FloorToInt(_score));
         }
     }
+
 }
