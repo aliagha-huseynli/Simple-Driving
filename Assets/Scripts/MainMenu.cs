@@ -2,13 +2,17 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private AndroidNotificationHandler _androidNotificationHandler;
+    [SerializeField] private IOSNotificationHandler _iosdNotificationHandler;
 
     [SerializeField] private TMP_Text _highScoreText;
     [SerializeField] private TMP_Text _energyText;
+
+    [SerializeField] private Button _playButton;
 
     [SerializeField] private int _maxEnergy;
     [SerializeField] private int _energyRechargeDuration; // A Minute
@@ -26,11 +30,22 @@ public class MainMenu : MonoBehaviour
 
 
 
+
     // Start
     private void Start()
     {
-        _highScore = PlayerPrefs.GetInt(Score.HighScoreKey, 0);
+        OnApplicationFocus(true);
         _highScoreText.text += $"High Score: {_highScore}";
+    }
+
+    // OnApplicationFocus
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus) { return; }
+
+        CancelInvoke();
+
+        _highScore = PlayerPrefs.GetInt(Score.HighScoreKey, 0);               
 
         _energy = PlayerPrefs.GetInt(EnergyKey, _maxEnergy);
 
@@ -47,10 +62,24 @@ public class MainMenu : MonoBehaviour
                 _energy = _maxEnergy;
                 PlayerPrefs.SetInt(EnergyKey, _energy);
             }
+            else
+            {
+                _playButton.interactable = false; // Turn Off Play Button
+                Invoke(nameof(EnergyRecharged), (_energyReady - DateTime.Now).Seconds);
+            }
         }
 
         _energyText.text = $"PLAY ({_energy})"; // Display on Button
 
+    }
+
+    //EnergyRecharged
+    private void EnergyRecharged()
+    {
+        _playButton.interactable = true; // Turn On Play Button
+        _energy = _maxEnergy;
+        PlayerPrefs.SetInt(EnergyKey, _energy);
+        _energyText.text = $"PLAY ({_energy})";
     }
 
     // Play
@@ -67,8 +96,11 @@ public class MainMenu : MonoBehaviour
             _energyRecharge = DateTime.Now.AddMinutes(_energyRechargeDuration);
             PlayerPrefs.SetString(EnergyReadyKey, _energyRecharge.ToString());
 
+            // Mobile Platforms
 #if UNITY_ANDROID
             _androidNotificationHandler.ScheduleNotification(_energyRecharge);
+#elif UNITY_IOS
+            _iosdNotificationHandler.ScheduleNotification(_energyRechargeDuration);
 #endif
 
         }
