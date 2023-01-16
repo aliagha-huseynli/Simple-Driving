@@ -6,8 +6,10 @@ using UnityEngine.SceneManagement;
 public class Car : MonoBehaviour
 {
     [SerializeField] private float _speed = 3f;
-    [SerializeField] private float _speedGainPerSecond = 0.2f;
+    [SerializeField] private float _speedGainPerSecond = 2f;
     [SerializeField] private float _turnSpeed = 200f;
+
+    private bool _isPressed = false;
 
     private int _steerValue;
 
@@ -16,11 +18,21 @@ public class Car : MonoBehaviour
     // Update
     private void Update()
     {
-        _speed += _speedGainPerSecond * Time.deltaTime;
+        if (_isPressed != true)
+        {
+            _speed += _speedGainPerSecond * Time.deltaTime;
 
-        transform.Rotate(0f, _steerValue * _turnSpeed * Time.deltaTime, 0f);
+            transform.Rotate(0f, _steerValue * _turnSpeed * Time.deltaTime, 0f);
 
-        transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+            transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+        }
+        else
+        {
+            _speed -= 5 * Time.deltaTime;
+            transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+
+        }
+        
 
     }
 
@@ -37,7 +49,14 @@ public class Car : MonoBehaviour
     // Steer
     public void Steer(int value)
     {
-        _steerValue = value;
+        _steerValue = value;        
 
     }
+
+    public void SlowDown(bool value)
+    {
+        _isPressed = value;        
+
+    }
+   
 }
